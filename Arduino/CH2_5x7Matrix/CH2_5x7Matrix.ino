@@ -23,7 +23,7 @@ void setup() {
   
 }
 
-// col 0..7
+// col 0..6
 void setCol(uint8_t col)
 {
   // the columns are the anodes of the 5x7 matrix
