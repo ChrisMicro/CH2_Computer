@@ -4,7 +4,7 @@
  Plays a melody
  
  circuit:
- * 8-ohm speaker on digital pin 8
+ * 100-ohm speaker on digital pin 9
  
  created 21 Jan 2010
  modified 30 Aug 2011
