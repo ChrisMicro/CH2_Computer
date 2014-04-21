@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include <util/delay.h>
 /**
 *
@@ -203,6 +204,7 @@ void setKeyRow(uint8_t row)
 	  PORTD|=(1<<(3+row)); // set row key pin to high
   }
 }
+
 void ledOn(){
   DDRC|=1; // set port to output
   PORTC|=1; // set pin high
@@ -236,6 +238,127 @@ uint8_t getKeyColumnPattern()
 
   return result;
 }
+
+void highImpedance()
+{
+	  // display lines
+	  DDRC&=~(1<<3);
+	  PORTC&=~(1<<3);
+	  DDRD&=~(1<<2);
+	  PORTD&=~(1<<2);
+	  DDRB&=~((1<<4)|(1<<5)|(1<<7));
+	  PORTB&=~((1<<4)|(1<<5)|(1<<7));
+
+	  // keyboard lines
+	  DDRD&=~((1<<3)|(1<<4)|(1<<5)|(1<<6)); // set all selector lines to input
+	  PORTD&=~((1<<3)|(1<<4)|(1<<5)|(1<<6)); // discharge and make sure pull ups are turned off
+	  DDRB&=~((1<<0)|(1<<2)|(1<<3)); // set all key lines as input
+	  PORTB&=~((1<<0)|(1<<2)|(1<<3)); // discharge
+}
+// key 2,5
+uint8_t check1()
+{
+	uint8_t result=0;
+	ledOn();
+	highImpedance();
+	DDRD|=(1<<6); // row 0 as output
+	//PORTD&=~(1<<6); // set to zero
+	PORTD|=(1<<3); // set pull up column 2
+	_delay_us(5);
+	if((PIND&(1<<3))==0)result=1;
+	ledOff();
+	return result;
+}
+//key 4,6 ( 5 is parasitic for key 2 )
+int8_t check2()
+{
+	uint8_t result=-1;
+	//ledOn();
+	highImpedance();
+	DDRB|=(1<<0); //  row 1 as output
+	//PORTB|=(1<<2)|(1<<3); //charge column1 and 3 with pullup
+	//PORTB&=~(1<<2)|(1<<3); // column1 and 2 high impedance
+	// if the key is pressed, column 1 and 2 should be discharged
+	PORTB|=(1<<2)|(1<<3); // set pull up column 1,3
+	//DDRB|=(1<<2)|(1<<3); // fast pull up
+	//DDRB&=~((1<<2)|(1<<3)); // fast pull up
+	_delay_us(5);
+	if((PINB&(1<<2))==0)result=4;
+	if((PINB&(1<<3))==0)result=6;
+
+	//ledOff();
+	highImpedance();
+	return result;
+}
+// key 8
+uint8_t check3()
+{
+	uint8_t result=0;
+	highImpedance();
+	ledOn();
+	DDRD|=(1<<5); // row 0 as output
+	//PORTD&=~(1<<6); // set to zero
+	PORTD|=(1<<3); // set pull up column 2
+	if(PIND&(1<<3))result=1;
+	ledOff();
+	highImpedance();
+	return result;
+}
+uint8_t check4()
+{
+	uint8_t result=0;
+	ledOn();
+	highImpedance();
+
+	DDRD|=(1<<6); // row 0 as output
+	PORTD|=(1<<3); // set pull up column 2
+	_delay_us(5);
+	if((PIND&(1<<3))==0)result=1;
+	DDRD&=~(1<<6); // row 0 back to high impedance
+
+	DDRD|=(1<<5); // row 2 as output
+	_delay_us(5);
+	if((PIND&(1<<3))==0)result=2;
+	DDRD&=~(1<<5); // row 2 back to high impedance
+
+	DDRD|=(1<<4); // row 3 as output
+	_delay_us(5);
+	if((PIND&(1<<3))==0)result=3;
+	DDRD&=~(1<<4); // row 3 back to high impedance
+
+	highImpedance();
+	ledOff();
+	return result;
+}
+int8_t check5()
+{
+	uint8_t result=-1;
+	highImpedance();
+
+	//ledOn();
+	DDRD|=(1<<3); // PD3 as output
+	PORTD|=(1<<3); // set to high
+
+	PORTD&=~((1<<4)|(1<<5)|(1<<6)); // set all lines to zero
+	DDRD|=((1<<4)|(1<<5)|(1<<6)); // output, discharge
+	DDRD&=~((1<<4)|(1<<5)|(1<<6)); // set to input
+	_delay_us(5);
+	if(PIND&(1<<4)) // 0
+	{
+		result=0;
+		//ledOff();
+	}
+	if(PIND&(1<<5)) // 8
+	{
+		result=8;
+		//ledOff();
+	}
+	if(PIND&(1<<6))result=2; //2
+
+	//ledOff();
+	highImpedance();
+	return result;
+}
 // return the number of the key pressed
 uint8_t scanKey()
 {
@@ -258,22 +381,38 @@ uint8_t scanKey()
 }
 
 void loop() {
-  uint8_t n,value;
-  ledOn();
+	//while(1)check2();
+	static int8_t value=0;
+  uint8_t n;
+  uint16_t z;
+
 // scan the keyboard and show the key as pixel
 // on the matrix display
-  for(n=0;n<4;n++)
+
+  //value=check5();
+  value=scanKey();
+  int8_t kcode[]={-1,-1,-1,5,11,10,-1,9,7,-1,3,1 };
+  value=kcode[value];
+  if(value==-1) value=check5();
+  if(value==-1) value=check2();
+
+  //if(value>5)value=5;
+  //for(z=0;z<100;z++)
   {
+	for(n=0;n<4;n++)
+	{
 	setKeyRow(n);
 
-	value=getKeyColumnPattern();
-	if(value!=0)ledOff();
+	//value=getKeyColumnPattern();
+
+	if(value==0)ledOn();
 	initDisplay();
 	setCol(n);
 	setRowPattern(value);
 	delay(1);
+	ledOff();
+	}
   }
-
 /*
   // show the binary value of the key pressed
   while(1)
