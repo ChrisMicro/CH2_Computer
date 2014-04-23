@@ -168,7 +168,7 @@ void loop() {
 	static int8_t value=0;
 	uint8_t n;
 
-	ledOff();
+	ledOn();
 
 	if(keyPressed())
 	{
@@ -178,7 +178,7 @@ void loop() {
 			tone(CH2_SPEAKERPIN, frequencyTable[value],50);
 			delay(50);
 		}
-		if(value==0)ledOn();
+		if(value==0)ledOff();
 
 	}
 
@@ -210,4 +210,3 @@ void loop() {
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 */
-

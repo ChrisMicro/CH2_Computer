@@ -61,7 +61,6 @@
 // row 0..3
 void setKeyRow(uint8_t row)
 {
-  uint8_t n;
   if(row<4)
   {
 	  // display lines
@@ -93,28 +92,40 @@ void setKeyRow(uint8_t row)
   }
 }
 
-
 #define KEYSCANDELAY 1
+void delayUs(uint8_t us)
+{
+	uint8_t n;
+	for(n=0;n<us;n++) _delay_us(KEYSCANDELAY);
+}
+
 uint8_t getKeyColumnPattern()
 {
   uint8_t result=0;
 
-  PORTB&=~((1<<3)|(1<<2)); // set not used multiplexer lines to 0
+  PORTB&=~((1<<3)|(1<<2)|(1<<0)); // set not used multiplexer lines to 0
+
   DDRB|=((1<<3)|(1<<2)); // set multplexer lines as outputs
   DDRB&=~(1<<0); // set the selected line as input
-  _delay_us(KEYSCANDELAY);
+  //_delay_us(KEYSCANDELAY);
+  delayUs(KEYSCANDELAY);
   if(PINB&(1<<0)) result|=(1<<0) ;
 
-  PORTB&=~((1<<3)|(1<<0)); // set not used multiplexer lines to 0
+
+  PORTB&=~((1<<3)|(1<<2)|(1<<0)); // set not used multiplexer lines to 0
+
   DDRB|=((1<<3)|(1<<0)); // set multplexer lines as outputs
   DDRB&=~(1<<2); // set the selected line as input
-  _delay_us(KEYSCANDELAY);
+  //_delay_us(KEYSCANDELAY);
+  delayUs(KEYSCANDELAY);
   if(PINB&(1<<2)) result|=(1<<1) ;
 
-  PORTB&=~((1<<2)|(1<<0)); // set not used multiplexer lines to 0
+
+  PORTB&=~((1<<3)|(1<<2)|(1<<0)); // set not used multiplexer lines to 0
+
   DDRB|=((1<<2)|(1<<0)); // set multplexer lines as outputs
   DDRB&=~(1<<3); // set the selected line as input
-  _delay_us(KEYSCANDELAY);
+  delayUs(KEYSCANDELAY);
   if(PINB&(1<<3)) result|=(1<<2) ;
 
   return result;
@@ -140,7 +151,6 @@ void highImpedance()
 }
 
 // return the number of the key pressed
-// driver for KEYBOARDTYPE1
 uint8_t scanKey1()
 {
 	uint8_t n,value,result=0,tmp;
@@ -158,9 +168,15 @@ uint8_t scanKey1()
 		if(result>0)break;
 
 	}while(n>0);
-	return result+n*3;
-}
 
+	tmp=result+n*3;
+	#ifdef KEYBOARDTYPE1
+		if(tmp==0)tmp=0xFF;
+		if(tmp==11)tmp=0;
+	#endif
+
+	return tmp;
+}
 //check keys 4,6 ( 5 reacts also like key2 )
 uint8_t checkKey46()
 {
@@ -170,7 +186,7 @@ uint8_t checkKey46()
 	DDRB|=(1<<0); //  row 1 as output
 	// if the key is pressed, column 1 and 2 should be discharged
 	PORTB|=(1<<2)|(1<<3); // set pull up column 1,3
-	_delay_us(5);
+	delayUs(5);
 	if((PINB&(1<<2))==0)result=4;
 	if((PINB&(1<<3))==0)result=6;
 
@@ -190,7 +206,7 @@ uint8_t checkKey028()
 	PORTD&=~((1<<4)|(1<<5)|(1<<6)); // set all lines to zero
 	DDRD|=((1<<4)|(1<<5)|(1<<6));   // output, discharge
 	DDRD&=~((1<<4)|(1<<5)|(1<<6));  // set to input
-	_delay_us(5);
+	delayUs(5);
 	if(PIND&(1<<4)) result=0;
 	if(PIND&(1<<5)) result=8;
 	if(PIND&(1<<6)) result=2;
@@ -234,8 +250,10 @@ uint8_t scanKey()
 
 	#ifdef KEYBOARDTYPE1
 	  temp=scanKey1();
-	#else KEYBOARDTYPE2
+	#endif
+	#ifdef KEYBOARDTYPE2
 	  temp=scanKey2();
+	  if(scanKey2()!=temp)temp=scanKey2(); // scan a third time if keys are not equal
 	#endif
 
   // restore port configuration
@@ -244,7 +262,7 @@ uint8_t scanKey()
   DDRD=ddrd;
 
   if(temp==10) return STARKEY; // '*'
-  if(temp==11) return 0; // zero
+  //if(temp==11) return 0; // zero
   if(temp==12) return HASHKEY; // '#'
   return temp;
 
@@ -277,7 +295,6 @@ uint8_t _keyPressed()
   switch(KeyState)
   {
     case KEYRELEASED:{
-      //ledOff();
       oldKey=NOKEY;
       if(temp!=NOKEY) {
         KeyValue=temp;
@@ -313,8 +330,6 @@ uint8_t _keyHit()
 {
   if(keyHit())
   {
-    //Serial.print(" LastKey:");
-    //Serial.println(LastKey);
     if(LastKey==STARKEY)return 0; // ignore shift key
     return 1;
   }else  return 0;
@@ -461,4 +476,3 @@ int8_t _getchar()
   if(n==19)c='s'; // set address
   return c;
 }
-
