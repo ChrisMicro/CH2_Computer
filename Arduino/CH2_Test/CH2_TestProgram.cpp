@@ -62,19 +62,28 @@ void loop() {
 	_putchar('O');	showMatrix(500);
 
 
+	//**************** key display example ***************************
+	do
+	{
+		n=_getchar();
+		value=getKey();
+		_putchar(n);
+		showLeds(value);
+	}
+	while(value!=0);
+
 	//**************** key sound display example ***************************
+	tone(CH2_SPEAKERPIN, frequencyTable[0],50);
 	do
 	{
 		n=_getchar();
 		value=getKey();
 		tone(CH2_SPEAKERPIN, frequencyTable[value],50);
-		_putchar(n++);
+		delay(50);
+		_putchar(n);
+		showLeds(value);
 	}
 	while(value!=0);
-
-
-
-
 }
 
 /*
