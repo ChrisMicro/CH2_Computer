@@ -83,8 +83,6 @@ void setCol(uint8_t col)
 // row 0..4, cathodes
 void setRow(uint8_t row)
 {
-  uint8_t n;
-
   // the rows are cathodes of the matrix and therefore active low
   PORTD|=(1<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<3); // clear all rows
   // resetting the line will drive the LED
