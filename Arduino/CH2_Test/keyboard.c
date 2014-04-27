@@ -1,5 +1,7 @@
 #include "keyboard.h"
+#define F_CPU 8000000UL // 8MHz with internal RC-Osciallator
 #include <util/delay.h>
+#include "display.h"
 
 /**
 *
@@ -107,7 +109,6 @@ uint8_t getKeyColumnPattern()
 
   DDRB|=((1<<3)|(1<<2)); // set multplexer lines as outputs
   DDRB&=~(1<<0); // set the selected line as input
-  //_delay_us(KEYSCANDELAY);
   delayUs(KEYSCANDELAY);
   if(PINB&(1<<0)) result|=(1<<0) ;
 
@@ -116,7 +117,6 @@ uint8_t getKeyColumnPattern()
 
   DDRB|=((1<<3)|(1<<0)); // set multplexer lines as outputs
   DDRB&=~(1<<2); // set the selected line as input
-  //_delay_us(KEYSCANDELAY);
   delayUs(KEYSCANDELAY);
   if(PINB&(1<<2)) result|=(1<<1) ;
 
@@ -220,15 +220,15 @@ uint8_t scanKey2()
 {
 	uint8_t value=0xFF;
 	static uint8_t state=0;
-
+/*
 	value=scanKey1();
 	uint8_t kcode[]={0xFF,0xFF,0xFF,5,11,10,0xFF,9,7,0xFF,3,1 };
 	value=kcode[value];
 	if(value==0xFF) value=checkKey028();
 	if(value==0xFF) value=checkKey46();
+*/
 
 
-	/*
 	switch(state)
 	{
 		case 0:{
@@ -241,15 +241,17 @@ uint8_t scanKey2()
 			}
 		}break;
 		case 1:{
-			if(value==0xFF) value=checkKey028();
-			state=2;
+			value=checkKey028();
+			if(value==0xFF) value=checkKey46();
+			state=0;
+
 		}break;
 		case 2:{
-			if(value==0xFF) value=checkKey46();
+			value=checkKey46();
 			state=0;
 		}break;
 	}
-	 */
+
 	return value;
 }
 
@@ -266,7 +268,9 @@ uint8_t scanKey()
   uint8_t ddrc;
   uint8_t ddrd;
   uint8_t ddrb;
-  uint8_t temp;
+  uint8_t temp=NOKEY;
+  static uint8_t oldKey;
+
 
   // save port configuration
   ddrb=DDRB;
@@ -276,9 +280,31 @@ uint8_t scanKey()
 	#ifdef KEYBOARDTYPE1
 	  temp=scanKey1();
 	#endif
+
 	#ifdef KEYBOARDTYPE2
-	  temp=scanKey2();
-	  if(scanKey2()!=temp)temp=scanKey2(); // scan a third time if keys are not equal
+
+		oldKey=scanKey2();
+		// key filter
+		if(oldKey!=NOKEY)
+		{
+			temp=scanKey2();
+			if(temp!=oldKey)
+			{
+				oldKey=temp;
+				temp=scanKey2();
+			}
+			if(temp!=oldKey)
+			{
+				oldKey=temp;
+				temp=scanKey2();
+			}
+			if(temp!=oldKey)
+			{
+				oldKey=temp;
+				temp=scanKey2();
+			}
+		}
+		if((temp>12)&&(temp<0xF0))temp=2; 	// dirty fix, remove this line later !!!
 	#endif
 
   // restore port configuration
@@ -467,7 +493,7 @@ uint8_t getKeyCode()
   uint8_t n;
   do
   {
-    showMatrix(50);
+    showMatrix(20);
   }while(!keyPressed());
 
   n=getKey();
