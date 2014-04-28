@@ -218,11 +218,11 @@ uint8_t checkKey028()
 // driver for KEYBOARDTYPE2
 uint8_t scanKey2()
 {
-	uint8_t value=0xFF;
-	static uint8_t state=0;
+	uint8_t tmp;
+	static uint8_t state=0,value=0xFF;
 /*
 	value=scanKey1();
-	uint8_t kcode[]={0xFF,0xFF,0xFF,5,11,10,0xFF,9,7,0xFF,3,1 };
+	uint8_t kcode[]={0xFF,0xFF,0xFF,5,12,10,0xFF,9,7,0xFF,3,1 };
 	value=kcode[value];
 	if(value==0xFF) value=checkKey028();
 	if(value==0xFF) value=checkKey46();
@@ -232,22 +232,20 @@ uint8_t scanKey2()
 	switch(state)
 	{
 		case 0:{
-			value=scanKey1();
-			uint8_t kcode[]={0xFF,0xFF,0xFF,5,11,10,0xFF,9,7,0xFF,3,1 };
-			value=kcode[value];
-			if(value==0xFF)
+			tmp=scanKey1();
+			uint8_t kcode[]={0xFF,0xFF,0xFF,5,12,10,0xFF,9,7,0xFF,3,1 };
+			tmp=kcode[tmp];
+			if(tmp==0xFF)
 			{
 				state=1;
+			}else
+			{
+				value=tmp;
 			}
 		}break;
 		case 1:{
 			value=checkKey028();
-			if(value==0xFF) value=checkKey46();
-			state=0;
-
-		}break;
-		case 2:{
-			value=checkKey46();
+			if(value==0xFF)	value=checkKey46();
 			state=0;
 		}break;
 	}
