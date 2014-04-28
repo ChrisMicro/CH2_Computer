@@ -35,7 +35,6 @@ uint16_t frequencyTable[]={
 };
 void setup()
 {
-	  initDisplay();
 	  pinMode(5, OUTPUT);      // sets the digital pin as output
 }
 
@@ -54,12 +53,26 @@ void loop() {
 		ledOff();
 		delay(200);
 	}
+	uint8_t row,col;
 
-	// show helo
+	// display row an colun test
+	initDisplay();
+	for(row=0;row<5;row++)
+	{
+		for(col=0;col<7;col++)
+		{
+
+		  setRow(row);
+		  setCol(col);
+		  delay(100);
+		}
+	}
+
+	// show hello
 	_putchar('H');	showMatrix(200);
 	_putchar('E');	showMatrix(200);
-	_putchar('L');	showMatrix(200);
-	_putchar('O');	showMatrix(500);
+	_putchar('L');	showMatrix(400);
+	_putchar('O');	showMatrix(200);
 
 
 	//**************** key display example ***************************
@@ -70,7 +83,7 @@ void loop() {
 		_putchar(n);
 		showLeds(value);
 	}
-	while(value!=0);
+	while(n!='i');
 
 	//**************** key sound display example ***************************
 	tone(CH2_SPEAKERPIN, frequencyTable[0],50);
@@ -83,7 +96,22 @@ void loop() {
 		_putchar(n);
 		showLeds(value);
 	}
-	while(value!=0);
+	while(n!='i');
+
+	// key code test
+	do
+	{
+		n=scanKey();
+		//initDisplay();
+		//setCol(0);
+		//setRowPattern(n);
+		if(n<0x10)	hex1(n);
+		else _putchar('n');
+		showLeds(n);
+		showMatrix(100);
+		//delay(1000);
+	}while(n!=HASHKEY);
+
 }
 
 /*

@@ -18,6 +18,7 @@ extern "C"
   void initDisplay();
   void setRowPattern(uint8_t bitPattern);
   void setCol(uint8_t col);
+  void setRow(uint8_t row);
   void showMatrix(uint16_t n);
   void setPixel(uint8_t x, uint8_t y, uint8_t intensity);
   void printCode(uint16_t c);
