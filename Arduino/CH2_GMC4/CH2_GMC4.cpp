@@ -2,7 +2,7 @@
 *
 * @file CH2_GMC4
 *
-* @brief Drive the row and colun lines of the 5x7 matrix display of the CH2-computer
+* @brief 4 bit microcontroller emulation on the CH2-Computer
 *
 * @author ChrisMicro
 * @copyright (c) 2014 ChrisMicro
@@ -72,7 +72,7 @@ uint8_t testProg[]={0,0XF,0,0,1,0XF,0,0};
 // random number music generator
 uint8_t Program7[]={0xB,1,6,4,0xE,0xB,0xF,0,0};
 // electronic dice
-uint8_t Program2[]={0xA,1,3,1,3,0xB,1,0xD,7,0xF,0,0};
+uint8_t Program2[]={0xA,1,3,1,3,0xB,1,0xD,7,0xF,0,0xE,0xA,1,0,0xF,0,2,0xF,0,0xE};
 
 
 /**************************************************************************
@@ -127,9 +127,11 @@ void loop() {
   {
       inp=_getchar();
       //SOUND(2000,30); // gakken key input sound 3kHz,30ms
+#ifdef ARDUINO
       Serial.print("key:");
       Serial.print((char)inp);
       Serial.print("  ");
+#endif
       switch(inp)
       {
           // increment
@@ -174,6 +176,7 @@ void loop() {
           case 'g':{
             cpu.Pc=0; // reset program counter
             if(number==9)ElectronicOrgan_GMC4Prog9();
+            if(number==0xA)PlayNotes_GMC4ProgA(&cpu);
             else
             {
               if(number==2)memcpy(&cpu.M,Program2,sizeof(Program2));

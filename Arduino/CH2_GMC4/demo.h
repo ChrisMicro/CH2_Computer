@@ -8,8 +8,10 @@ extern "C"
 
   #include <stdint.h>
   #include "systemout.h"
+  #include "gmc4Vm.h"
   void startup();
   void ElectronicOrgan_GMC4Prog9();
+  void PlayNotes_GMC4ProgA(Cpu_t *cpu);
 
 #endif // __DEMO__
 
