@@ -1,5 +1,6 @@
 
 #include "Arduino.h"
+#include "display.h"
 #define F_CPU 8000000UL // system frequency
 #define FS ( F_CPU/256 ) // sampling frequency
 
@@ -29,18 +30,9 @@ void initTimer()
 }
 void setup() {
 	initTimer();
-}
-void ledOn()
-{
-  DDRC|=1;
-
-  PORTC|=1;
+	initDisplay();
 }
 
-void ledOff()
-{
-  PORTC&=~1;
-}
 
 volatile uint16_t MsTimer=0,FreqCoefficient=1000,Amplitude=100;
 
@@ -50,6 +42,7 @@ SIGNAL (TIMER1_OVF_vect)
 	static uint16_t phase0;
 	static uint16_t sig0;
 
+	ledOn();
 	phase0+=FreqCoefficient; //0.88us
 
 	sig0=Amplitude*(phase0>>8);
@@ -62,7 +55,9 @@ SIGNAL (TIMER1_OVF_vect)
 		MsTimer++; // increase millisecond timer
 		// mstimerrate=0.992 milli seconds @FCPU16MHz
 		timer=31;
+		_showMatrix();
 	}
+	ledOff();
 }
 
 void iDelay(uint16_t d)
@@ -73,15 +68,23 @@ void iDelay(uint16_t d)
 
 void setFreq(uint16_t freq)
 {
-
 	FreqCoefficient=freq*65536UL/FS;
 }
-void loop() {
-  ledOn();
-  //delay(250);              // wait for a second
-  iDelay(250);
-  ledOff();
-  delay(250);              // wait for a second
-  //FreqCoefficient+=100;
-  setFreq(0);
+
+#define DELAY 100
+
+void loop()
+{
+	static uint8_t n;
+	_putchar('C');
+	while(1)
+	{
+	  //ledOn();
+	  //delay(250);              // wait for a second
+	  iDelay(DELAY);
+	  //ledOff();
+	  delay(DELAY);              // wait for a second
+	  //FreqCoefficient+=100;
+	  setFreq(0);
+	}
 }
