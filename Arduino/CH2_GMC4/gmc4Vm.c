@@ -338,14 +338,9 @@ void executeVm(Cpu_t *cpu)
 				//Pause for the time calculated by (value of A register +1) * 0.1 seconds.
 				case CAL_TIMR:{
 					DISASM("CAL_TIMR  ");
-					uint16_t n;
+
 					showMatrix(((cpu->M[AR])*100+1));
-					/*
-				    for(n=0;n<((cpu->M[AR])*100+1);n++)
-				    {
-				      showMatrix();
-				      _delay_ms(1);
-				    }*/
+
 					SYSTEMOUT("delay");
 					cpu->flag=1;
 				}break;

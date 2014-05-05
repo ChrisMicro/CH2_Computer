@@ -48,8 +48,8 @@ extern "C"
     }
     sei();*/
 	#ifdef CH2_PLATFORM
-		tone(CH2_SPEAKERPIN, frequency,duration/2);
-		delay(duration/2);
+		tone(CH2_SPEAKERPIN, frequency,duration);
+		delay(duration+50);
 	#else
 		tone(CH_SPEAKERPIN, frequency,duration);
 		delay(duration);

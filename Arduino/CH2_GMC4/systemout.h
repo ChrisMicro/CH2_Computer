@@ -24,6 +24,7 @@ extern "C"
 		#define SYSTEMOUT(text) {systemOut(text);}
 		#define SYSTEMOUT_(text)
 		#define SYSTEMOUTHEX(text,value) { SystemOutHex( text, value);}
+		#define SYSTEMOUTHEX1(value) { hex1( value);}
 		#define SYSTEMOUTCR {puts("");};
         #define SYSTEMOUTCHAR(value) { _putchar(value); }
 
