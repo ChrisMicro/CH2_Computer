@@ -54,7 +54,7 @@ void ElectronicOrgan_GMC4Prog9()
 void PlayNotes_GMC4ProgA(Cpu_t *cpu)
 {
   uint16_t tempo;
-  uint16_t speed;
+  uint16_t duration;
   uint8_t note;
   uint8_t index=0;
 
@@ -63,13 +63,13 @@ void PlayNotes_GMC4ProgA(Cpu_t *cpu)
   do
   {
 	note=cpu->M[index++];
-	speed=cpu->M[index++]*tempo*50;
+	duration=cpu->M[index++]*tempo*3;
 	if(note==0) // repeat song
 	{
 		index=1;
 	}else // play note
 	{
-		gmcSound(note,speed); // play note
+		gmcSound(note,duration); // play note
 	}
 	c=scanKey();
   }while(c!=HASHKEY); // pressing the hash key '#' exits the program
