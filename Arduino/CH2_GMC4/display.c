@@ -25,7 +25,13 @@ void ledOff()
 {
   PORTC&=~1;
 }
-
+void toggleLed()
+{
+	static uint8_t state=0;
+	if(state==0)ledOff();
+	else ledOn();
+	state^=1;
+}
 void initDisplay()
 {
 	  // set row lines as output

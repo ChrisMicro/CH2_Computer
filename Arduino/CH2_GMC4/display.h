@@ -27,6 +27,7 @@ extern "C"
   void showLeds(uint8_t k);
   void ledOn();
   void ledOff();
+  void toggleLed();
 
   extern uint8_t DisplayMem[NUMCOLUMNS];
 

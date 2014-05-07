@@ -10,14 +10,37 @@
 
 void startup()
 {
-  SYSTEMOUTCHAR('C');
-  showMatrix(1000);
+	initDisplay();
+	uint8_t row,col;
+	// test display rows and columns, led and speaker
+	for(row=0;row<5;row++)
+	{
+		for(col=0;col<7;col++)
+		{
 
-  SYSTEMOUTCHAR('H');
-  showMatrix(1000);
+		  setRow(row);
+		  setCol(col);
 
-  SYSTEMOUTCHAR('2');
-  showMatrix(1000);
+		  _delay_ms(50);
+
+		}
+		gmcSound(row,20); // play note
+	    toggleLed();
+	}
+	ledOff();
+
+	// test speaker
+    gmcSound(8,20); // play note
+
+	// show computer name
+	SYSTEMOUTCHAR('C');
+	showMatrix(500);
+
+	SYSTEMOUTCHAR('H');
+	showMatrix(500);
+
+	SYSTEMOUTCHAR('2');
+	showMatrix(500);
 
 }
 /***************************************************************************
@@ -74,4 +97,37 @@ void PlayNotes_GMC4ProgA(Cpu_t *cpu)
 	c=scanKey();
   }while(c!=HASHKEY); // pressing the hash key '#' exits the program
   _putchar('n');
+}
+/***************************************************************************
+
+ joystick test
+
+***************************************************************************/
+void JoystickTest()
+{
+	  const int xAxis = 1;
+	  const int yAxis = 2;
+
+	  uint32_t x,y;
+	  uint8_t row,col,c;
+	  uint8_t soundOnFlag=0;
+
+	  do
+	  {
+		  x = 1023-readAdc(xAxis); // x axis of joystick is inverted
+		  _delay_ms(10);
+		  c=scanKey();
+		  if(c==1)soundOnFlag=1;
+		  if(c==2)soundOnFlag=0;
+		  y = readAdc(yAxis);
+
+		  initDisplay();
+		  setCol(6-(x*7/1024));
+		  setRow(y*5/1024);
+		  if(soundOnFlag)gmcSound((x*7/1024),30); // play note
+		  _delay_ms(30);
+
+
+	  }while(c!=HASHKEY); // pressing the hash key '#' exits the program
+	  _putchar('n');
 }

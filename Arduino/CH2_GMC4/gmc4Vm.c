@@ -82,15 +82,12 @@ void executeVm(Cpu_t *cpu)
             SYSTEMOUT("nokey");
             cpu->flag=1;
           }
-
-            showMatrix(20);
-
-
 		}break;
 		// AO 	Ar->Op 		1 	The 7-segment readout displays the value currently contained in the A register.
 		case AO:{
 			DISASM("AO   ");
-			show7Segment(cpu->M[AR]);
+			//show7Segment(cpu->M[AR]);
+			DISPLAYOUTHEX(cpu->M[AR]);
 			 //PRINT7SEGMENT(x);
 			cpu->flag=1;
 		}break;
@@ -341,7 +338,6 @@ void executeVm(Cpu_t *cpu)
 
 					showMatrix(((cpu->M[AR])*100+1));
 
-					SYSTEMOUT("delay");
 					cpu->flag=1;
 				}break;
 

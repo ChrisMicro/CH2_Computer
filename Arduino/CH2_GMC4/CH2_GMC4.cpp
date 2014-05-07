@@ -55,6 +55,14 @@ extern "C"
 		delay(duration);
 	#endif
   }
+  uint16_t readAdc(uint8_t channel)
+  {
+	  return analogRead(channel);
+  }
+  void aDelay(uint16_t t)
+  {
+	  delay(t);
+  }
   void systemOut(char * str)
   {
     Serial.println(str);
@@ -64,7 +72,12 @@ extern "C"
     Serial.print(str);
     Serial.print(" ");
     Serial.println(n,HEX);
-
+  }
+  void displayOutHex(uint8_t n)
+  {
+	    // 5x7 matrix output:
+	    hex1(n);
+	    showMatrix(20);
   }
 }
 
@@ -177,6 +190,7 @@ void loop() {
             cpu.Pc=0; // reset program counter
             if(number==9)ElectronicOrgan_GMC4Prog9();
             if(number==0xA)PlayNotes_GMC4ProgA(&cpu);
+            if(number==0xF) JoystickTest();
             else
             {
               if(number==2)memcpy(&cpu.M,Program2,sizeof(Program2));

@@ -1,1 +1,0 @@
-Arduino Uno compatible microcomputer.
