@@ -1,0 +1,15 @@
+//blink led
+
+TIA 8 4		// delay time -> A
+TIY A 7		// led number 7 ( ultrabright led )  -> Y
+loop:
+SETR E 1        // turn led on
+TIMR E C	// delay
+RSTR E 2	// led off
+TIMR E C	// delay
+JUMP F 0 4	// jump loop 
+
+8 F A 0 E 1 E C E 2 E C F 0 4
+
+
+
