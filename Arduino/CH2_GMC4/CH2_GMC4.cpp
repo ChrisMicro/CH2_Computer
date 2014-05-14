@@ -157,7 +157,8 @@ void loop() {
           case 'i':{
               cpu.M[cpu.Pc]=number;
               cpu.Pc++;
-              cpu.Pc&=0b00111111;
+              if(cpu.Pc>M_SIZE)cpu.Pc=0;
+
 #ifdef ARDUINO
               Serial.print(cpu.Pc,HEX);Serial.print(" ");
               Serial.print(cpu.M[cpu.Pc],HEX);Serial.println(" ");
