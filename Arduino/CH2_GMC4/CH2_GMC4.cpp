@@ -10,6 +10,12 @@
 * The CH2-Computer can be used as a shield for Ardduinos with an Atmega168 or Atmega328
 * microcontroller ( mainly Arduino Uno ).
 *
+*
+* Fuses for Atmega328p: low:0xE2 high:0xD9 extend:0xFF
+*
+*
+*
+*
 */
 #include "Arduino.h"
 
@@ -221,6 +227,9 @@ void loop() {
           // aset ( set address )
           case 's':{
               cpu.Pc=(oldNumber<<4)+number;
+              hex1(cpu.M[cpu.Pc]);
+              showLeds(cpu.Pc);
+              number=cpu.M[cpu.Pc];
               //printf("%02x: ",cpu.Pc);
               //printf("%x  ",cpu.M[cpu.Pc]);
           }break;
