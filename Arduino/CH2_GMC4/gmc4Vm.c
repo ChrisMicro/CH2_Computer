@@ -344,8 +344,11 @@ void executeVm(Cpu_t *cpu)
 				//0xED //	CAL DSPR 	1 	Set the 2-pin LEDs with the value from data memory. The data to display is as follows: the upper three bits come from memory address 5F (bits 0-2), and the lower four from memory address 5E (bits 0-3).
 				case CAL_DSPR:{
 					DISASM("CAL_DSPR  ");
-
-					SYSTEMOUT("set LED");
+					//SYSTEMOUT("set LED");
+					cpu->leds=0; // clear all leds
+					cpu->leds|=(cpu->M[0x5E])&0xF;
+					cpu->leds|=((cpu->M[0x5F])&0xF)<<4;
+					SHOWLEDS(cpu->leds);
 					cpu->flag=1;
 				}break;
 				//0xEE // 	CAL DEM- 	1
