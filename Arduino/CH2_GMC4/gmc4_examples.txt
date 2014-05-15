@@ -1,4 +1,9 @@
-//blink led
+Manual for the GMC4-computer
+http://otonanokagaku.net/english/manuals/pdf/vol24_microcomputer.pdf
+
+
+blink led ( blinks external LED on CH2-computer )
+=========
 
 TIA 8 4		// delay time -> A
 TIY A 7		// led number 7 ( ultrabright led )  -> Y
@@ -9,7 +14,18 @@ RSTR E 2	// led off
 TIMR E C	// delay
 JUMP F 0 4	// jump loop 
 
-8 F A 0 E 1 E C E 2 E C F 0 4
+8 4 A 0 E 1 E C E 2 E C F 0 4
 
+
+repeat playing error sound
+==========================
+
+loop:
+CAL_ERRS E 8   // play error sound
+TIA      8 F   // load a with delay time
+TIMR     E C   // delay
+JUMP     F 0 0 // jump loop
+
+E 8 8 F E C F 0 0 
 
 
